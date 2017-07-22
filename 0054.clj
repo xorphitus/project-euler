@@ -41,12 +41,19 @@
 (defn three-of-a-kind? [hand]
   (= [3 1 1] (hand->pairs hand)))
 
-(defn straight? [hand] false)
+(defn straight? [hand]
+  (let [nums (hand->nums hand)
+        i (first nums)
+        s (take 5 (iterate inc i))]
+    (and (not (flush? hand))
+        (or (= nums s)
+            (= nums [11 12 13 14 2])
+            (= nums [   12 13 14 2 3])
+            (= nums [      13 14 2 3 4])))))
 
 (defn royal-flush? [hand]
   (and (flush? hand)
-      (= (+ 10 11 12 13 14)
-         (reduce + (hand->nums hand)))))
+      (= [10 11 12 13 14] (hand->nums hand))))
 
 (defn straight-flush? [hand]
   (and (not (royal-flush? hand))
