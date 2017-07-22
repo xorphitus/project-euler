@@ -1,5 +1,8 @@
 (ns pe54)
 
+;; FIXME: fix path of the input file
+(def file-path "/path/to/p054_poker.txt")
+
 (defn card->num [card]
   (let [c (first card)]
     (condp = c
@@ -87,7 +90,7 @@
 (defn compare-highcards [cards1 cards2]
   (let [ranked-cards (map vector cards1 cards2)
         win-lose (map #(compare (first %) (last %)) ranked-cards)
-        first-conclusion (->> win-lose (filter zero?) first)]
+        first-conclusion (->> win-lose (filter pos?) first)]
     (= first-conclusion 1)))
 
 (defn p1-win? [hands]
@@ -99,8 +102,11 @@
 
 (def s-split clojure.string/split)
 
-(let [text (slurp "/path/to/p054_poker.txt")
-      lines (s-split text #"\n")
-      lines2 (map #(s-split % #"\s") lines)
-      hands (map #(split-at 5 %) lines2)]
-  (count (filter p1-win? hands)))
+(-> file-path
+    slurp
+    (s-split #"\n")
+    (as-> x
+      (map #(s-split % #"\s") x)
+      (map #(split-at 5 %) x)
+      (filter p1-win? x))
+    count)
