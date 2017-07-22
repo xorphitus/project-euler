@@ -64,32 +64,42 @@
 
 (defn straight? [hand] false)
 
-(defn royal-flush? [hand] false)
+(defn royal-flush? [hand]
+  (and (flush? hand)
+      (= (+ 10 11 12 13 14)
+         (reduce + (hand->nums hand)))))
 
 (defn straight-flush? [hand]
   (and (not (royal-flush? hand))
       (straight? hand)
       (flush? hand)))
 
+(defn hand->highcard [hand]
+  (-> hand
+      hand->nums
+      last))
+
 (defn hand->score [hand]
-  (cond
-    (royal-flush? hand)    9
-    (straight-flush? hand) 8
-    (four-of-a-kind? hand) 7
-    (full-house? hand)     6
-    (flush? hand) 5
-    (straight? hand) 4
-    (three-of-a-kind? hand) 3
-    (two-pairs? hand) 2
-    (one-pair? hand) 1
-    :else 0))
+  (let [rank (cond
+             (royal-flush? hand)     9
+             (straight-flush? hand)  8
+             (four-of-a-kind? hand)  7
+             (full-house? hand)      6
+             (flush? hand)           5
+             (straight? hand)        4
+             (three-of-a-kind? hand) 3
+             (two-pairs? hand)       2
+             (one-pair? hand)        1
+             :else 0)]
+    [rank (hand->highcard hand)]))
 
 (defn p1-win? [hands]
-  (let [p1 (hand->score (first hands)
-            )
-        p2 (hand->score (last hands)
-            )]
-    (> p1 p2)))
+  (let [p1 (hand->score (first hands))
+        p2 (hand->score (last hands))]
+    (if (> (p1 0) (p2 0))
+      true
+      (and (= (p1 0) (p2 0))
+          (> (p1 1) (p2 1))))))
 
 (let [text (slurp "/path/to/p054_poker.txt")
       lines (clojure.string/split text #"\n")
