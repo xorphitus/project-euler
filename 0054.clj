@@ -19,48 +19,27 @@
 (defn hand->nums [hand]
   (vec (sort (map card->num hand))))
 
-(defn four-of-a-kind? [hand]
-  (->> (hand->nums hand)
+(defn hand->pairs [hand]
+  (->> hand
+       hand->nums
        (partition-by identity)
-       (filter #(= 4 (count %)))
-       seq))
+       (map count)
+       reverse))
+
+(defn four-of-a-kind? [hand]
+  (= [4 1] (hand->pairs hand)))
 
 (defn full-house? [hand]
-  (let [nums (hand->nums hand)
-        two (->> nums
-                 (partition-by identity)
-                 (filter #(= 2 (count %)))
-                 seq)
-        three (->> nums
-                   (partition-by identity)
-                   (filter #(= 3 (count %)))
-                   seq)]
-    (and two three)))
+  (= [3 2] (hand->pairs hand)))
 
 (defn two-pairs? [hand]
-  (and (not full-house? hand)
-      (->> (hand->nums hand)
-           (partition-by identity)
-           (filter #(= 2 (count %)))
-           (count)
-           (= 2))))
+  (= [2 2 1] (hand->pairs hand)))
 
 (defn one-pair? [hand]
-  (let [nums (hand->nums hand)]
-    (and (not (full-house? nums))
-        (->> nums
-             (partition-by identity)
-             (filter #(= 2 (count %)))
-             (count)
-             (= 1)))))
+  (= [2 1 1 1] (hand->pairs hand)))
 
 (defn three-of-a-kind? [hand]
-  (let [nums (hand->nums hand)]
-    (and (not (full-house? nums))
-        (->> nums
-             (partition-by identity)
-             (filter #(= 3 (count %)))
-             seq))))
+  (= [3 1 1] (hand->pairs hand)))
 
 (defn straight? [hand] false)
 
@@ -81,16 +60,16 @@
 
 (defn hand->score [hand]
   (let [rank (cond
-             (royal-flush? hand)     9
-             (straight-flush? hand)  8
-             (four-of-a-kind? hand)  7
-             (full-house? hand)      6
-             (flush? hand)           5
-             (straight? hand)        4
-             (three-of-a-kind? hand) 3
-             (two-pairs? hand)       2
-             (one-pair? hand)        1
-             :else 0)]
+               (royal-flush? hand)     9
+               (straight-flush? hand)  8
+               (four-of-a-kind? hand)  7
+               (full-house? hand)      6
+               (flush? hand)           5
+               (straight? hand)        4
+               (three-of-a-kind? hand) 3
+               (two-pairs? hand)       2
+               (one-pair? hand)        1
+               :else 0)]
     [rank (hand->highcard hand)]))
 
 (defn p1-win? [hands]
