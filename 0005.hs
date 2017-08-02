@@ -79,7 +79,7 @@ aggregatePrimes xss =
 -- >>> multiply [(2, 1), (3, 2)]
 -- 18
 multiply :: [(Int, Int)] -> Int
-multiply xs = product $ map (\x -> fst x ^ snd x) xs
+multiply xs = product $ map (\x -> uncurry (^) x) xs
 
 main :: IO ()
 main = print $ multiply $ aggregatePrimes (map decomposeToPrimes [1..20])
