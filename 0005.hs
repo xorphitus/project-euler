@@ -29,8 +29,8 @@ isPrime x
   | x == 2    = True
   | otherwise =
     let limit = ceiling $ sqrt $ fromIntegral x
-        list = [2] ++ [3,5..limit]
-    in all (\n -> (rem x n) /= 0) list
+        list = 2 : [3,5..limit]
+    in all (\n -> rem x n /= 0) list
 
 primes :: Int -> [Int]
 primes x = filter isPrime [2..x]
@@ -44,7 +44,7 @@ primes x = filter isPrime [2..x]
 countPrime :: Int -> Int -> Int
 countPrime n p =
   let factors = map fst
-        $ filter ((== 0) . (rem n) . snd)
+        $ filter ((== 0) . rem n . snd)
         $ takeWhile (\x -> snd x <= n)
         $ map (\x -> (x, p ^ x)) [1..]
   in case factors of
@@ -60,14 +60,13 @@ countPrime n p =
 decomposeToPrimes :: Int -> [(Int, Int)]
 decomposeToPrimes x =
   let p = primes x
-  in filter (\y -> (snd y) > 0) $ map (\n -> (n, (countPrime x n))) p
+  in filter (\y -> snd y > 0) $ map (\n -> (n, countPrime x n)) p
 
 -- >>> aggregatePrimes [[(2, 1), (3, 2)], [(2, 3), (5, 1)], [(2, 1), (3, 1)]]
 -- [(2, 3), (3, 2), (5, 1)]
 aggregatePrimes :: [[(Int, Int)]] -> [(Int, Int)]
 aggregatePrimes xss =
-  let flatten = foldr (++) []
-      order = \x y ->
+  let order x y =
         let o = compare (fst x) (fst y)
         in case o of
           EQ -> compare (snd x) (snd y)
@@ -75,12 +74,12 @@ aggregatePrimes xss =
   in map last
     $ groupBy (\x y -> fst x == fst y)
     $ sortBy order
-    $ flatten xss
+    $ concat xss
 
 -- >>> multiply [(2, 1), (3, 2)]
 -- 18
 multiply :: [(Int, Int)] -> Int
-multiply xs = foldr (*) 1 $ map (\x -> (fst x) ^ (snd x)) xs
+multiply xs = product $ map (\x -> fst x ^ snd x) xs
 
 main :: IO ()
 main = print $ multiply $ aggregatePrimes (map decomposeToPrimes [1..20])
