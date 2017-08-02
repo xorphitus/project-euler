@@ -1,5 +1,3 @@
--- WIP
-
 import Data.List
 
 {-|
@@ -23,17 +21,16 @@ import Data.List
 19 =                                 19^1
 20 = 2^2     5^1
 
-=> 2^4 * 3^2 * 5^1 * 7^1 * 13^1 * 17^1 * 19^1
+=> 2^4 * 3^2 * 5^1 * 7^1 * 11^1 * 13^1 * 17^1 * 19^1
 -}
 
-toMaxPrimeFactor :: Int -> Int
-toMaxPrimeFactor = ceiling . sqrt . fromIntegral
-
 isPrime :: Int -> Bool
-isPrime x =
-  let limit = toMaxPrimeFactor x
-      list = [2] ++ [3,5..limit]
-  in all (\n -> (rem x n) /= 0) list
+isPrime x
+  | x == 2    = True
+  | otherwise =
+    let limit = ceiling $ sqrt $ fromIntegral x
+        list = [2] ++ [3,5..limit]
+    in all (\n -> (rem x n) /= 0) list
 
 primes :: Int -> [Int]
 primes x = filter isPrime [2..x]
@@ -63,7 +60,7 @@ countPrime n p =
 decomposeToPrimes :: Int -> [(Int, Int)]
 decomposeToPrimes x =
   let p = primes x
-  in map (\n -> (n, (countPrime x n))) p
+  in filter (\y -> (snd y) > 0) $ map (\n -> (n, (countPrime x n))) p
 
 -- >>> aggregatePrimes [[(2, 1), (3, 2)], [(2, 3), (5, 1)], [(2, 1), (3, 1)]]
 -- [(2, 3), (3, 2), (5, 1)]
