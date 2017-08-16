@@ -41,16 +41,33 @@ toGroup xs =
   in map (\n -> take 4 (drop n xs) ) nums
 
 toDowns :: [[Int]] -> [[Int]]
-toDowns =  concat . map toGroup
+toDowns =  concatMap toGroup
 
 toRights :: [[Int]] -> [[Int]]
 toRights = toDowns . transpose
 
 toDiags1 :: [[Int]] -> [[Int]]
-toDiags1 xss = undefined
+toDiags1 xss =
+  let hori = toGroup [0..groupLength]
+      vert = hori
+      blocks = [(x, y) | x <- hori, y <- vert]
+      f x = map (\i -> (fst x !! i, snd x !! i) ) [0..3]
+      positions = map f blocks
+      extract matrix position =
+        let p = map (\x -> position !! x) [0..3]
+        in map (\x -> matrix !! fst x !! snd x) p
+  in map (extract xss) positions
 
 toDiags2 :: [[Int]] -> [[Int]]
 toDiags2 = toDiags1 . map reverse
 
+findMax :: [[Int]] -> Int
+findMax xss =
+  let down = toDowns xss
+      right = toRights xss
+      diag1 = toDiags1 xss
+      diag2 = toDiags2 xss
+  in maximum $ map product (down ++ right ++ diag1 ++ diag2)
+
 main :: IO ()
-main = print $ toDowns $ toSubLists $ words input
+main = print $ findMax $ toSubLists $ words input
