@@ -27,6 +27,10 @@ input = "08 02 22 97 38 15 00 40 00 75 04 05 07 78 52 12 50 77 91 08\
 groupLength :: Int
 groupLength = 20
 
+unitLength :: Int
+unitLength = 4
+
+-- TODO: これがバグってそう
 toSubLists :: [String] -> [[Int]]
 toSubLists xs =
   let nums = [0..(length xs - groupLength)]
@@ -37,8 +41,8 @@ toNum x = read x :: Int
 
 toGroup :: [a] -> [[a]]
 toGroup xs =
-  let nums = [0..(length xs - 4)]
-  in map (\n -> take 4 (drop n xs) ) nums
+  let nums = [0..(length xs - unitLength)]
+  in map (\n -> take unitLength (drop n xs) ) nums
 
 toDowns :: [[Int]] -> [[Int]]
 toDowns =  concatMap toGroup
@@ -48,11 +52,11 @@ toRights = toDowns . transpose
 
 toDiags1 :: [[Int]] -> [[Int]]
 toDiags1 xss =
-  let hori = toGroup [0..groupLength]
+  let hori = [0..(groupLength - unitLength)]
       vert = hori
-      blocks = [(x, y) | x <- hori, y <- vert]
-      f x = map (\i -> (fst x !! i, snd x !! i) ) [0..3]
-      positions = map f blocks
+      leftTops = [(x, y) | x <- hori, y <- vert]
+      leftTopToDiags (p, q) = map (\i -> (p + i, q + i)) [0..3]
+      positions = map leftTopToDiags leftTops
       extract matrix position =
         let p = map (\x -> position !! x) [0..3]
         in map (\x -> matrix !! fst x !! snd x) p
