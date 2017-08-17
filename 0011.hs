@@ -32,7 +32,7 @@ unitLength :: Int
 unitLength = 4
 
 toSubLists :: [String] -> [[Int]]
-toSubLists = (chunksOf groupLength) . (map toNum)
+toSubLists = chunksOf groupLength . map toNum
 
 toNum :: String -> Int
 toNum x = read x :: Int
