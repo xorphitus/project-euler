@@ -1,11 +1,8 @@
 (ns pe4)
 
 (defn palindrome? [num]
-  (let [s (str num)
-        center (int (/ (count s) 2))
-        [front rear] (split-at center s)]
-    (->> (map vector front (reverse rear))
-         (every? #(= (% 0) (% 1))))))
+  (let [s (str num)]
+    (= (seq s) (reverse s))))
 
 (defn three-digits
   ([] (three-digits 100))
