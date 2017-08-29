@@ -1,5 +1,4 @@
--- WIP
--- 遅すぎて終わらないかもver
+import Data.List
 
 limit :: Int
 limit = 1000000
@@ -18,4 +17,4 @@ collatzSeq n = toSeq [n]
       | otherwise = toSeq (collatz x : x : xs)
 
 main :: IO ()
-main = print $ maximum $ map (length . collatzSeq) [1..limit]
+main = print $ maximumBy (\(x, _) (y, _) -> compare x y) $ map (\x -> (length $ collatzSeq x, x)) [1..limit]
